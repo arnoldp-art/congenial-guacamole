@@ -2,7 +2,7 @@
   "name": "belgium-historical-map",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/",
+  "homepage": "https://arnoldp-art.github.io/congenial-guacamole",
   "description": "Interactive historical map of Belgium showing cities and vegetation changes over time",
   "overrides": {
     "ajv": "^8.8.2",
