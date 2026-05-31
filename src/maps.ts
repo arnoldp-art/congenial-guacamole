@@ -22,6 +22,10 @@ const NGI_TOPO = (id: string) =>
 const NGI_ORTHO = (id: string) =>
   `https://wmts.ngi.be/arcgis/rest/services/ortho__default__3857__${id}/MapServer/tile/{z}/{y}/{x}`;
 
+// Esri public tile services — no auth required
+const ESRI = (service: string) =>
+  `https://server.arcgisonline.com/ArcGIS/rest/services/${service}/MapServer/tile/{z}/{y}/{x}`;
+
 export const MAPS: HistoricalMap[] = [
   {
     id: 'frickx',
@@ -149,6 +153,15 @@ export const MAPS: HistoricalMap[] = [
     url: NGI_ORTHO('1995'),
     attribution: '© NGI/IGN Belgium',
   },
+  {
+    id: 'satellite',
+    year: 2020,
+    name: 'Satellite imagery',
+    description: 'Esri World Imagery · high-resolution satellite · current coverage',
+    type: 'xyz',
+    url: ESRI('World_Imagery'),
+    attribution: '© Esri, Maxar, Earthstar Geographics',
+  },
 ];
 
 // Blend window in years on each side of a transition
@@ -172,4 +185,4 @@ export function computeOpacities(year: number): number[] {
 }
 
 export const MIN_YEAR = 1712;
-export const MAX_YEAR = 2000;
+export const MAX_YEAR = 2024;

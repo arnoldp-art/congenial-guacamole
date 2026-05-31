@@ -1,9 +1,9 @@
 import { HistoricalMap } from './maps';
 
-// CSDI ArcGIS REST tile endpoint — same Esri y/x convention as NGI Belgium
-// tile/{z}/{y}/{x} (y before x)
-const CSDI = (serviceId: string) =>
-  `https://p1static.csdi.gov.hk/server/rest/services/common/${serviceId}/MapServer/tile/{z}/{y}/{x}`;
+// Lands Department public Map API — official XYZ tile service for HK
+// Standard z/x/y tile order, WGS84 spatial reference
+const LANDSD = (layer: string) =>
+  `https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/${layer}/WGS84/{z}/{x}/{y}.png`;
 
 // Esri public tile services — no auth required
 const ESRI = (service: string) =>
@@ -16,7 +16,7 @@ export const MAPS_HK: HistoricalMap[] = [
     name: 'Aerial survey 1963',
     description: 'DOP1000-1963 · 0.1m resolution · aerial photos Jan/Feb 1963 · Lands Department HKSAR',
     type: 'xyz',
-    url: CSDI('landsd_rcd_1637306686961_88197'),
+    url: LANDSD('dop1963'),
     attribution: '© Lands Department, HKSAR Government',
   },
   {
@@ -25,7 +25,7 @@ export const MAPS_HK: HistoricalMap[] = [
     name: 'Aerial survey 1982',
     description: 'DOP5000-1982 · aerial photos October 1982 · Lands Department HKSAR',
     type: 'xyz',
-    url: CSDI('landsd_rcd_1671589976272_67085'),
+    url: LANDSD('dop1982'),
     attribution: '© Lands Department, HKSAR Government',
   },
   {
