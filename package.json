@@ -5,7 +5,12 @@
   "homepage": "/",
   "description": "Interactive historical map of Belgium showing cities and vegetation changes over time",
   "overrides": {
-    "ajv": "^8.8.2"
+    "ajv": "^8.8.2",
+    "fork-ts-checker-webpack-plugin": {
+      "ajv": "6.12.6",
+      "ajv-keywords": "^3.5.2",
+      "schema-utils": "^2.7.0"
+    }
   },
   "dependencies": {
     "d3": "^7.8.5",
