@@ -29,7 +29,7 @@ export const MAPS: HistoricalMap[] = [
     name: 'Pourbus map',
     description: 'Painted map of the Brugse Vrije by Pieter Pourbus · 1571 · oldest detailed map of Flanders',
     type: 'xyz',
-    url: DV('pourbuskaart'),
+    url: DV('pourbus'),
     attribution: '© Digitaal Vlaanderen – Pourbuskaart 1571',
   },
   {
@@ -158,33 +158,6 @@ export const MAPS: HistoricalMap[] = [
     url: NGI_ORTHO('1995'),
     attribution: '© NGI/IGN Belgium',
   },
-  {
-    id: 'ortho-2003',
-    year: 2003,
-    name: 'Aerial survey 2000–2003',
-    description: 'Early 21st century orthophoto mosaic',
-    type: 'xyz',
-    url: NGI_ORTHO('2000-2003'),
-    attribution: '© NGI/IGN Belgium',
-  },
-  {
-    id: 'ortho-2009',
-    year: 2009,
-    name: 'Aerial survey 2006–2009',
-    description: 'Mid-2000s orthophoto mosaic',
-    type: 'xyz',
-    url: NGI_ORTHO('2006-2009'),
-    attribution: '© NGI/IGN Belgium',
-  },
-  {
-    id: 'ortho-2015',
-    year: 2015,
-    name: 'Aerial survey 2012–2015',
-    description: 'High-resolution orthophoto mosaic',
-    type: 'xyz',
-    url: NGI_ORTHO('2012-2015'),
-    attribution: '© NGI/IGN Belgium',
-  },
 ];
 
 // Blend window in years on each side of a transition
@@ -208,4 +181,4 @@ export function computeOpacities(year: number): number[] {
 }
 
 export const MIN_YEAR = 1571;
-export const MAX_YEAR = 2025;
+export const MAX_YEAR = 2000;
