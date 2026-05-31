@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, WMSTileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import { MAPS, computeOpacities, MIN_YEAR, MAX_YEAR } from './maps';
@@ -47,26 +47,12 @@ export default function App() {
         >
           {MAPS.map((m, i) => {
             if (opacities[i] < 0.01) return null;
-            if (m.type === 'wms') {
-              return (
-                <WMSTileLayer
-                  key={m.id}
-                  url={m.url}
-                  layers={m.wmsLayer ?? ''}
-                  format="image/png"
-                  transparent={false}
-                  opacity={opacities[i]}
-                  attribution={m.attribution}
-                />
-              );
-            }
             return (
               <TileLayer
                 key={m.id}
                 url={m.url}
                 opacity={opacities[i]}
                 attribution={m.attribution}
-                subdomains="abcd"
               />
             );
           })}
