@@ -6,19 +6,35 @@
 
 .header {
   background: #16213e;
-  padding: 12px 20px;
+  padding: 10px 20px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   border-bottom: 1px solid #0f3460;
   flex-shrink: 0;
 }
 
 .header h1 {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   white-space: nowrap;
   color: #e0e0e0;
 }
+
+.era-badge {
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.era-badge[data-era="0"] { background: #5c4a1e; color: #f0d080; }
+.era-badge[data-era="1"] { background: #3b4a2e; color: #a8c57a; }
+.era-badge[data-era="2"] { background: #4a2e1e; color: #e09050; }
+.era-badge[data-era="3"] { background: #1e1e2e; color: #a0a0c0; }
+.era-badge[data-era="4"] { background: #1e3a3a; color: #80d0d0; }
 
 .timeline {
   display: flex;
@@ -30,18 +46,19 @@
 .timeline input[type='range'] {
   flex: 1;
   accent-color: #e74c3c;
+  cursor: pointer;
 }
 
 .year-label {
-  font-size: 0.8rem;
-  color: #aaa;
+  font-size: 0.75rem;
+  color: #888;
 }
 
 .current-year {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #e74c3c;
-  min-width: 48px;
+  min-width: 52px;
   text-align: right;
 }
 
@@ -50,26 +67,45 @@
   min-height: 0;
 }
 
-.legend {
+.controls {
   background: #16213e;
   padding: 8px 20px;
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
   border-top: 1px solid #0f3460;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  text-transform: capitalize;
+.controls-label {
+  font-size: 0.78rem;
+  color: #888;
+  margin-right: 4px;
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
+.layer-btn {
+  background: #0f3460;
+  color: #aaa;
+  border: 1px solid #1a4a80;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.layer-btn.active {
+  background: #1a5276;
+  color: #e0e0e0;
+  border-color: #3498db;
+}
+
+.layer-btn:hover {
+  border-color: #3498db;
+}
+
+.era-summary {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: #666;
 }
