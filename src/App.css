@@ -13,6 +13,10 @@ body {
 .map-wrapper { flex: 1; min-height: 0; }
 .leaflet-layer { transition: opacity 0.5s ease; }
 
+/* ── Show/hide helpers ───────────────────────────────────────────────────── */
+.desktop-only { display: block; }
+.mobile-only  { display: none; }
+
 /* ── Map info (top-left) ─────────────────────────────────────────────────── */
 .map-info {
   position: absolute;
@@ -33,7 +37,7 @@ body {
 .blend-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
 .blend-fill { height: 100%; background: #c9a84c; border-radius: 2px; transition: width 0.1s; }
 
-/* ── Painting panel (top-right) ──────────────────────────────────────────── */
+/* ── Painting panel — desktop (top-right) ────────────────────────────────── */
 .painting-panel {
   position: absolute;
   top: 16px; right: 16px;
@@ -92,11 +96,11 @@ body {
   position: absolute; top: 10px; right: 12px;
   background: rgba(10,8,4,0.75); border: 1px solid #4a3820;
   color: #c9a84c; border-radius: 50%;
-  width: 28px; height: 28px;
+  width: 36px; height: 36px;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 0.75rem; z-index: 1;
+  cursor: pointer; font-size: 1rem; z-index: 1;
 }
-.lightbox-img { max-width: 85vw; max-height: 75vh; object-fit: contain; display: block; }
+.lightbox-img { max-width: 85vw; max-height: 72vh; object-fit: contain; display: block; }
 .lightbox-caption {
   padding: 10px 14px; font-size: 0.72rem; color: #a09060;
   line-height: 1.5; border-top: 1px solid #3a2810;
@@ -104,12 +108,12 @@ body {
 .lightbox-caption strong { color: #c9a84c; }
 .lightbox-source { color: #5a4830; font-style: italic; }
 
-/* ── Bottom bar (controls + timeline merged) ─────────────────────────────── */
+/* ── DESKTOP bottom bar ──────────────────────────────────────────────────── */
 .bottom-bar {
   position: absolute;
   bottom: 0; left: 0; right: 0;
   z-index: 1000;
-  background: rgba(8, 6, 2, 0.92);
+  background: rgba(8,6,2,0.92);
   border-top: 1px solid rgba(180,140,60,0.25);
   backdrop-filter: blur(8px);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
@@ -118,36 +122,40 @@ body {
   flex-direction: column;
   gap: 8px;
 }
-
-/* Top row: play, year, slider, speed */
-.controls-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
+.controls-row { display: flex; align-items: center; gap: 14px; }
 .play-btn {
   background: #4a3820; border: 1px solid #6a5030;
   border-radius: 50%; width: 36px; height: 36px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 0.9rem; color: #c9a84c;
-  transition: background 0.15s;
+  cursor: pointer; font-size: 0.9rem; color: #c9a84c; transition: background 0.15s;
 }
 .play-btn:hover { background: #5a4828; }
-
 .year-num {
   font-size: 1.5rem; font-weight: 700; color: #f0d070;
   min-width: 54px; font-variant-numeric: tabular-nums; flex-shrink: 0;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  letter-spacing: 0.02em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8); letter-spacing: 0.02em;
 }
-
 .slider-wrap { flex: 1; position: relative; }
 .slider {
-  width: 100%; accent-color: #c9a84c; cursor: pointer;
-  height: 6px; display: block;
+  width: 100%; cursor: pointer; display: block;
+  /* explicit cross-browser track */
+  -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px;
+  background: rgba(180,140,60,0.30);
+  outline: none;
 }
-
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #c9a84c; cursor: pointer;
+  border: 2px solid #f0d070;
+  box-shadow: 0 0 4px rgba(0,0,0,0.6);
+}
+.slider::-moz-range-thumb {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #c9a84c; cursor: pointer;
+  border: 2px solid #f0d070; box-shadow: 0 0 4px rgba(0,0,0,0.6);
+}
 .speed-btns { display: flex; gap: 5px; flex-shrink: 0; }
 .speed-btn {
   background: rgba(40,28,8,0.8); border: 1px solid #4a3820;
@@ -157,45 +165,237 @@ body {
 .speed-btn.active { background: #5a3e18; color: #f0d070; border-color: #8a6030; }
 .speed-btn:hover { border-color: #8a7050; color: #c9a84c; }
 
-/* Bottom row: tick timeline */
-.tick-row {
-  position: relative;
-  height: 28px;
-  margin: 0 2px;
-}
-
-/* Baseline rule */
+.tick-row { position: relative; height: 28px; margin: 0 2px; }
 .tick-row::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
   background: rgba(180,140,60,0.20);
 }
-
 .tick {
   position: absolute; transform: translateX(-50%);
   background: none; border: none; cursor: pointer;
   display: flex; flex-direction: column; align-items: center;
   gap: 3px; padding: 0; top: 0;
 }
-
-.tick-line {
-  display: block; width: 1px; height: 7px;
-  background: rgba(200,160,70,0.55);
-}
+.tick-line { display: block; width: 1px; height: 7px; background: rgba(200,160,70,0.55); }
 .tick-label {
-  font-size: 0.62rem;
-  color: #c8a040;
-  white-space: nowrap;
+  font-size: 0.62rem; color: #c8a040; white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9); font-weight: 500;
 }
 .tick:hover .tick-line { background: #f0d070; height: 9px; }
 .tick:hover .tick-label { color: #f0d070; }
-
 .tick-painting .tick-line { background: rgba(220,130,60,0.7); width: 2px; }
 .tick-painting .tick-label { color: #e09050; font-size: 0.75rem; }
 .tick-painting:hover .tick-line { background: #ffaa60; }
 .tick-painting:hover .tick-label { color: #ffaa60; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE  (≤ 768 px)
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .desktop-only { display: none !important; }
+  .mobile-only  { display: flex !important; }
+
+  /* Shrink map info on mobile */
+  .map-info {
+    top: 10px; left: 10px;
+    max-width: calc(100vw - 80px);
+    padding: 7px 10px;
+  }
+  .map-name { font-size: 0.82rem; }
+  .map-desc { font-size: 0.65rem; }
+
+  /* ── Mobile: floating painting button ── */
+  .mobile-painting-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    z-index: 1001;
+    background: rgba(10,8,4,0.88);
+    border: 1px solid rgba(180,140,60,0.5);
+    border-radius: 10px;
+    color: #c9a84c;
+    font-size: 1.4rem;
+    width: 52px; height: 52px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  .mobile-painting-badge {
+    font-size: 0.52rem;
+    color: #a09060;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  /* ── Mobile: painting bottom sheet ── */
+  .mobile-painting-sheet {
+    position: absolute;
+    bottom: 175px; /* sits above the mobile bar */
+    left: 10px; right: 10px;
+    z-index: 1002;
+    background: rgba(10,8,4,0.95);
+    border: 1px solid rgba(180,140,60,0.40);
+    border-radius: 12px;
+    padding: 10px 12px 14px;
+    flex-direction: column;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  }
+  .mobile-sheet-handle {
+    width: 36px; height: 4px;
+    background: rgba(180,140,60,0.4);
+    border-radius: 2px;
+    margin: 0 auto 10px;
+    cursor: pointer;
+  }
+
+  /* ── Mobile bottom bar ── */
+  .mobile-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: rgba(8,6,2,0.95);
+    border-top: 1px solid rgba(180,140,60,0.25);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+    padding: 10px 14px 20px; /* extra bottom for home-bar safe area */
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Row 1: play + year + speed */
+  .mobile-top-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .mobile-play-btn {
+    background: #4a3820; border: 1px solid #6a5030;
+    border-radius: 50%; width: 48px; height: 48px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; color: #c9a84c; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-year {
+    font-size: 2rem; font-weight: 700; color: #f0d070;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    min-width: 72px; flex-shrink: 0;
+  }
+  .mobile-speed-btns { display: flex; gap: 6px; margin-left: auto; }
+  .mobile-speed-btn {
+    background: rgba(40,28,8,0.8); border: 1px solid #4a3820;
+    color: #a09060; border-radius: 8px;
+    padding: 8px 12px; font-size: 0.78rem; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    min-width: 48px; text-align: center;
+  }
+  .mobile-speed-btn.active { background: #5a3e18; color: #f0d070; border-color: #8a6030; }
+
+  /* Row 2: slider */
+  .mobile-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .mobile-year-edge {
+    font-size: 0.62rem; color: #7a6030;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  /* The slider itself — fully custom for Android/iOS */
+  .mobile-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 44px;          /* large tap area */
+    background: transparent;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-slider::-webkit-slider-runnable-track {
+    height: 8px;
+    background: rgba(180,140,60,0.35);
+    border-radius: 4px;
+    border: none;
+  }
+  .mobile-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #c9a84c;
+    border: 3px solid #f0d070;
+    box-shadow: 0 0 8px rgba(192,160,60,0.6);
+    margin-top: -12px;     /* centre thumb on track */
+    cursor: pointer;
+  }
+  .mobile-slider::-moz-range-track {
+    height: 8px;
+    background: rgba(180,140,60,0.35);
+    border-radius: 4px;
+    border: none;
+  }
+  .mobile-slider::-moz-range-thumb {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #c9a84c;
+    border: 3px solid #f0d070;
+    box-shadow: 0 0 8px rgba(192,160,60,0.6);
+    cursor: pointer;
+  }
+
+  /* Row 3: era jump buttons */
+  .mobile-era-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    width: 100%;
+  }
+  .mobile-era-row::-webkit-scrollbar { display: none; }
+  .mobile-era-btn {
+    background: rgba(30,22,8,0.9);
+    border: 1px solid rgba(180,140,60,0.25);
+    color: #a09060;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-era-btn.active {
+    background: #4a3820;
+    color: #f0d070;
+    border-color: #8a6030;
+  }
+  .mobile-era-btn.is-painting {
+    border-color: rgba(220,130,60,0.4);
+    color: #c08050;
+  }
+  .mobile-era-btn.is-painting.active { color: #ffaa60; border-color: #e08040; }
+}
+
+/* Safe area for iPhone home bar */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .mobile-bar {
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+  }
+}
