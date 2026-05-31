@@ -11,7 +11,7 @@ body {
 #root { height: 100vh; }
 .app { position: relative; height: 100vh; display: flex; flex-direction: column; }
 .map-wrapper { flex: 1; min-height: 0; }
-.leaflet-layer { transition: opacity 0.5s ease; }
+.leaflet-layer { }
 
 /* ── Show/hide helpers ───────────────────────────────────────────────────── */
 .desktop-only { display: block; }
