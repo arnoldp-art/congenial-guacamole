@@ -1,0 +1,75 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  background: #16213e;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #0f3460;
+  flex-shrink: 0;
+}
+
+.header h1 {
+  font-size: 1.2rem;
+  white-space: nowrap;
+  color: #e0e0e0;
+}
+
+.timeline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.timeline input[type='range'] {
+  flex: 1;
+  accent-color: #e74c3c;
+}
+
+.year-label {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.current-year {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #e74c3c;
+  min-width: 48px;
+  text-align: right;
+}
+
+.map-wrapper {
+  flex: 1;
+  min-height: 0;
+}
+
+.legend {
+  background: #16213e;
+  padding: 8px 20px;
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+  border-top: 1px solid #0f3460;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
