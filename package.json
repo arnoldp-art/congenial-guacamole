@@ -4,8 +4,10 @@
   "private": true,
   "homepage": "/",
   "description": "Interactive historical map of Belgium showing cities and vegetation changes over time",
+  "overrides": {
+    "ajv": "^8.8.2"
+  },
   "dependencies": {
-    "ajv": "6.12.6",
     "d3": "^7.8.5",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
