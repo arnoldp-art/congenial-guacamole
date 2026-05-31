@@ -24,6 +24,15 @@ const NGI_ORTHO = (id: string) =>
 
 export const MAPS: HistoricalMap[] = [
   {
+    id: 'pourbus',
+    year: 1571,
+    name: 'Pourbus map',
+    description: 'Painted map of the Brugse Vrije by Pieter Pourbus · 1571 · oldest detailed map of Flanders',
+    type: 'xyz',
+    url: DV('pourbuskaart'),
+    attribution: '© Digitaal Vlaanderen – Pourbuskaart 1571',
+  },
+  {
     id: 'frickx',
     year: 1712,
     name: 'Frickx map',
@@ -40,6 +49,15 @@ export const MAPS: HistoricalMap[] = [
     type: 'xyz',
     url: DV('ferraris'),
     attribution: '© Digitaal Vlaanderen – Ferraris 1770–1778',
+  },
+  {
+    id: 'abw',
+    year: 1843,
+    name: 'Atlas der Buurtwegen',
+    description: 'Atlas of Neighbourhood Roads · detailed parcel and road survey of Flanders · c. 1840–1845',
+    type: 'xyz',
+    url: DV('abw'),
+    attribution: '© Digitaal Vlaanderen – Atlas der Buurtwegen c.1840',
   },
   {
     id: 'vandermaelen',
@@ -105,12 +123,30 @@ export const MAPS: HistoricalMap[] = [
     attribution: '© NGI/IGN Belgium',
   },
   {
+    id: 'ortho-1971',
+    year: 1971,
+    name: 'Aerial survey 1969–1979',
+    description: 'Orthophoto mosaic covering Belgium 1969–1979',
+    type: 'xyz',
+    url: NGI_ORTHO('1969-1979'),
+    attribution: '© NGI/IGN Belgium',
+  },
+  {
     id: 'ngi-1981',
     year: 1981,
     name: 'NGI topographic 1981',
-    description: '',
+    description: 'Survey of Belgium during the late industrial era',
     type: 'xyz',
     url: NGI_TOPO('1220'),
+    attribution: '© NGI/IGN Belgium',
+  },
+  {
+    id: 'ngi-1989',
+    year: 1989,
+    name: 'NGI topographic 1989',
+    description: 'Late 20th century survey of Belgium · pre-EU enlargement era',
+    type: 'xyz',
+    url: NGI_TOPO('1300'),
     attribution: '© NGI/IGN Belgium',
   },
   {
@@ -120,6 +156,33 @@ export const MAPS: HistoricalMap[] = [
     description: 'Late 20th century aerial photography',
     type: 'xyz',
     url: NGI_ORTHO('1995'),
+    attribution: '© NGI/IGN Belgium',
+  },
+  {
+    id: 'ortho-2003',
+    year: 2003,
+    name: 'Aerial survey 2000–2003',
+    description: 'Early 21st century orthophoto mosaic',
+    type: 'xyz',
+    url: NGI_ORTHO('2000-2003'),
+    attribution: '© NGI/IGN Belgium',
+  },
+  {
+    id: 'ortho-2009',
+    year: 2009,
+    name: 'Aerial survey 2006–2009',
+    description: 'Mid-2000s orthophoto mosaic',
+    type: 'xyz',
+    url: NGI_ORTHO('2006-2009'),
+    attribution: '© NGI/IGN Belgium',
+  },
+  {
+    id: 'ortho-2015',
+    year: 2015,
+    name: 'Aerial survey 2012–2015',
+    description: 'High-resolution orthophoto mosaic',
+    type: 'xyz',
+    url: NGI_ORTHO('2012-2015'),
     attribution: '© NGI/IGN Belgium',
   },
 ];
@@ -144,5 +207,5 @@ export function computeOpacities(year: number): number[] {
   });
 }
 
-export const MIN_YEAR = 1712;
-export const MAX_YEAR = 2000;
+export const MIN_YEAR = 1571;
+export const MAX_YEAR = 2025;
