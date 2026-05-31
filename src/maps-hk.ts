@@ -1,52 +1,42 @@
 import { HistoricalMap } from './maps';
 
-// HK Lands Department / Survey and Mapping Office tiles
-// Standard XYZ — {z}/{x}/{y}
-const HK = (path: string) =>
-  `https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/${path}/{z}/{x}/{y}.png`;
-
-// HK Government historical aerial photos via GeoData Store
-const HK_AERIAL = (year: string) =>
-  `https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/orthophoto/${year}/{z}/{x}/{y}.png`;
+// CSDI (Common Spatial Data Infrastructure) WMS — open data, no API key
+// ArcGIS MapServer WMS: layer "0" is the main raster layer
+const CSDI_WMS = (serviceId: string) =>
+  `https://p1static.csdi.gov.hk/server/services/common/${serviceId}/MapServer/WMSServer`;
 
 export const MAPS_HK: HistoricalMap[] = [
   {
-    id: 'hk-topo-1945',
-    year: 1945,
-    name: 'British survey 1945',
-    description: 'British colonial topographic survey of Hong Kong · post-WWII reoccupation',
-    type: 'xyz',
-    url: 'https://tiles.arcgis.com/tiles/1KSVSmnHT2Lw9ea6/arcgis/rest/services/HK_Historical_Map_1945/MapServer/tile/{z}/{y}/{x}',
-    attribution: '© Survey & Mapping Office, Lands Department, HKSAR',
-  },
-  {
-    id: 'hk-topo-1963',
+    id: 'hk-dop1963',
     year: 1963,
-    name: 'Colonial survey 1963',
-    description: 'Hong Kong Crown Colony topographic map · rapid post-war industrialisation',
-    type: 'xyz',
-    url: 'https://tiles.arcgis.com/tiles/1KSVSmnHT2Lw9ea6/arcgis/rest/services/HK_Historical_Map_1963/MapServer/tile/{z}/{y}/{x}',
-    attribution: '© Survey & Mapping Office, Lands Department, HKSAR',
+    name: 'Aerial survey 1963',
+    description: 'Digital Orthophoto DOP1000-1963 · 0.1m resolution · New Territories & Kowloon · Lands Department HKSAR',
+    type: 'wms',
+    url: CSDI_WMS('landsd_rcd_1637306686961_88197'),
+    wmsLayer: '0',
+    attribution: '© Lands Department, HKSAR Government',
   },
   {
-    id: 'hk-topo-1980',
-    year: 1980,
-    name: 'HK topographic 1980',
-    description: 'Survey during the last decade of major New Territories transformation',
-    type: 'xyz',
-    url: 'https://tiles.arcgis.com/tiles/1KSVSmnHT2Lw9ea6/arcgis/rest/services/HK_Historical_Map_1980/MapServer/tile/{z}/{y}/{x}',
-    attribution: '© Survey & Mapping Office, Lands Department, HKSAR',
+    id: 'hk-dop1982',
+    year: 1982,
+    name: 'Aerial survey 1982',
+    description: 'Digital Orthophoto DOP5000-1982 · aerial photos from October 1982 · Lands Department HKSAR',
+    type: 'wms',
+    url: CSDI_WMS('landsd_rcd_1671589976272_67085'),
+    wmsLayer: '0',
+    attribution: '© Lands Department, HKSAR Government',
   },
   {
-    id: 'hk-topo-2000',
-    year: 2000,
-    name: 'HK topographic 2000',
-    description: 'Post-handover Hong Kong · New Territories development',
-    type: 'xyz',
-    url: HK('basemap/wgs84'),
+    id: 'hk-tdop',
+    year: 2020,
+    name: 'True Digital Orthophoto',
+    description: 'TDOP Series · 0.25m resolution · whole territory of Hong Kong · current coverage',
+    type: 'wms',
+    url: CSDI_WMS('landsd_rcd_1701762716904_4826'),
+    wmsLayer: '0',
     attribution: '© Lands Department, HKSAR Government',
   },
 ];
 
-export const MIN_YEAR_HK = 1945;
-export const MAX_YEAR_HK = 2000;
+export const MIN_YEAR_HK = 1963;
+export const MAX_YEAR_HK = 2024;

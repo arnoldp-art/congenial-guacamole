@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, WMSTileLayer, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import { MAPS, MIN_YEAR, MAX_YEAR } from './maps';
@@ -127,7 +127,11 @@ function MapView({ city, onBack }: { city: CityConfig; onBack: () => void }) {
         <MapContainer center={center} zoom={zoom}
           style={{ height: '100%', width: '100%' }} zoomControl={true}>
           <Recentre center={center} year={year} />
-          {maps.map((m, i) => i !== primaryIdx ? null : (
+          {maps.map((m, i) => i !== primaryIdx ? null : m.type === 'wms' ? (
+            <WMSTileLayer key={m.id} url={m.url} layers={m.wmsLayer ?? '0'}
+              format="image/png" transparent={false} attribution={m.attribution}
+              eventHandlers={{ tileerror: () => markFailed(m.id) }} />
+          ) : (
             <TileLayer key={m.id} url={m.url} opacity={1} attribution={m.attribution}
               eventHandlers={{ tileerror: () => markFailed(m.id) }} />
           ))}
