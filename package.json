@@ -30,6 +30,7 @@
     "gh-pages": "^6.0.0"
   },
   "scripts": {
+    "postinstall": "node scripts/patch-ajv.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
