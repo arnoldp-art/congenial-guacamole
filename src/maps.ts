@@ -51,6 +51,15 @@ export const MAPS: HistoricalMap[] = [
     attribution: '© Digitaal Vlaanderen – Vandermaelen 1846–1854',
   },
   {
+    id: 'popp',
+    year: 1860,
+    name: 'Popp cadastral atlas',
+    description: 'Atlas Cadastral Parcellaire de la Belgique · Philippe-Christian Popp · 1842–1879 · parcel-level detail',
+    type: 'xyz',
+    url: DV('popp'),
+    attribution: '© Digitaal Vlaanderen – Popp 1842–1879',
+  },
+  {
     id: 'ngi-1873',
     year: 1873,
     name: 'NGI topographic 1873',
