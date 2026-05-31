@@ -1,189 +1,252 @@
-import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Polygon, Polyline, CircleMarker, Popup, useMap } from 'react-leaflet';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  MapContainer, TileLayer, WMSTileLayer, Polygon, Polyline,
+  CircleMarker, Popup, useMap,
+} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
 import {
-  FORESTS, ROADS, URBAN_AREAS, ERAS, getEra,
-  type ForestFeature, type RoadFeature,
-} from './historicalLayers';
+  VEGETATION, WATER, ROADS, URBAN, getTileConfig, ROAD_STYLES, VEGETATION_COLORS,
+  type TileConfig,
+} from './mechelenLayers';
 
 interface HistoricalEvent {
-  id: string;
-  year: number;
-  title: string;
-  description: string;
-  lat: number;
-  lng: number;
-  category: string;
-  impact: string;
+  id: string; year: number; title: string; description: string;
+  lat: number; lng: number; category: string; impact: string;
 }
-
-const EVENT_COLORS: Record<string, string> = {
-  political: '#e74c3c',
-  economic: '#f39c12',
-  cultural: '#9b59b6',
-  war: '#ff6b35',
-};
 
 const MIN_YEAR = 979;
 const MAX_YEAR = 2002;
+const MECHELEN = [51.028, 4.480] as [number, number];
 
-// Swaps tile layer when era changes
-function TileLayerSwitcher({ year }: { year: number }) {
-  const era = getEra(year);
+const ERA_FILTERS: Record<string, string> = {
+  'Medieval':         'sepia(0.6) brightness(0.95)',
+  'Ferraris (1770s)': 'sepia(0.3) brightness(1.02)',
+  'Vandermaelen (1846)': 'sepia(0.15) brightness(1.0)',
+  'Modern':           'none',
+};
+
+// Switches base tile layer when config changes
+function BaseTileLayer({ config }: { config: TileConfig }) {
+  const map = useMap();
+
+  // Apply CSS filter to the tile pane to give historical map an aged look
+  useEffect(() => {
+    const pane = map.getPane('tilePane');
+    if (pane) pane.style.filter = ERA_FILTERS[config.label] ?? 'none';
+  }, [config.label, map]);
+
+  if (config.type === 'wms') {
+    return (
+      <WMSTileLayer
+        key={config.label}
+        url={config.url}
+        layers={(config.options.layers as string) ?? ''}
+        format={(config.options.format as string) ?? 'image/png'}
+        transparent={!!(config.options.transparent)}
+        attribution={(config.options.attribution as string) ?? ''}
+      />
+    );
+  }
   return (
     <TileLayer
-      key={era.label}
-      attribution={era.tileAttribution}
-      url={era.tileUrl}
+      key={config.label}
+      url={config.url}
+      attribution={(config.options.attribution as string) ?? ''}
+      subdomains={(config.options.subdomains as string) ?? 'abc'}
+      maxZoom={(config.options.maxZoom as number) ?? 19}
     />
   );
 }
 
-// Forces map re-render when key changes (workaround for TileLayer not updating url)
-function MapUpdater({ year }: { year: number }) {
-  const map = useMap();
-  useEffect(() => {
-    map.invalidateSize();
-  }, [year, map]);
-  return null;
-}
-
 export default function App() {
   const [events, setEvents] = useState<HistoricalEvent[]>([]);
-  const [year, setYear] = useState(979);
-  const [showForests, setShowForests] = useState(true);
-  const [showRoads, setShowRoads] = useState(true);
-  const [showUrban, setShowUrban] = useState(true);
-  const [showEvents, setShowEvents] = useState(true);
+  const [year, setYear] = useState(MIN_YEAR);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(50); // ms per year step
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/data/historical-events.json')
       .then(r => r.json())
-      .then(d => setEvents(d.events));
+      .then(d => setEvents(
+        d.events.filter((e: HistoricalEvent) =>
+          e.lat >= 50.92 && e.lat <= 51.15 &&
+          e.lng >= 4.30 && e.lng <= 4.65
+        )
+      ));
   }, []);
 
-  const era = getEra(year);
+  const tick = useCallback(() => {
+    setYear(y => {
+      if (y >= MAX_YEAR) { setPlaying(false); return MAX_YEAR; }
+      return y + 1;
+    });
+  }, []);
 
-  const activeForests = showForests
-    ? FORESTS.filter(f => year >= f.fromYear && year <= f.toYear)
-    : [];
+  useEffect(() => {
+    if (playing) {
+      intervalRef.current = setInterval(tick, speed);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [playing, speed, tick]);
 
-  const activeRoads = showRoads
-    ? ROADS.filter(r => year >= r.fromYear)
-    : [];
+  const tileConfig = getTileConfig(year);
 
-  const visibleEvents = showEvents
-    ? events.filter(e => e.year <= year)
-    : [];
+  const activeVeg = VEGETATION.filter(v => year >= v.fromYear && year <= v.toYear);
+  const activeRoads = ROADS.filter(r => year >= r.fromYear);
+  const activeWater = WATER.filter(w => year >= w.fromYear);
 
-  // Urban areas: show the largest ring whose year <= current year
-  const urbanPolygons = showUrban
-    ? URBAN_AREAS.map(city => {
-        const ringIdx = city.years.reduce((best, y, i) => (y <= year ? i : best), -1);
-        if (ringIdx < 0) return null;
-        return { ...city, ring: city.coords[ringIdx] };
-      }).filter(Boolean)
-    : [];
+  // Urban: show largest footprint whose fromYear <= year
+  const urbanRings = URBAN.reduce<typeof URBAN>((acc, u) => {
+    if (u.fromYear > year) return acc;
+    const existing = acc.findIndex(x => x.id.split('-')[0] + '-' + x.id.split('-')[1] === u.id.split('-')[0] + '-' + u.id.split('-')[1]);
+    // group by city prefix
+    const prefix = u.id.replace(/-\d+$/, '').replace(/-\d{3,4}$/, '');
+    const existingIdx = acc.findIndex(x => x.id.replace(/-\d{3,4}$/, '') === prefix);
+    if (existingIdx >= 0) { acc[existingIdx] = u; return acc; }
+    return [...acc, u];
+  }, []);
 
-  const eraIndex = ERAS.findIndex(e => e.label === era.label);
+  const visibleEvents = events.filter(e => e.year <= year);
 
   return (
     <div className="app">
       <header className="header">
-        <h1>Belgium Historical Map</h1>
-        <div className="era-badge" data-era={eraIndex}>{era.label}</div>
-        <div className="timeline">
+        <div className="title-block">
+          <h1>Mechelen</h1>
+          <span className="era-tag">{tileConfig.label}</span>
+        </div>
+        <div className="timeline-block">
+          <button
+            className={`play-btn ${playing ? 'pause' : 'play'}`}
+            onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}
+            title={playing ? 'Pause' : 'Play'}
+          >
+            {playing ? '⏸' : '▶'}
+          </button>
           <span className="year-label">{MIN_YEAR}</span>
           <input
-            type="range"
-            min={MIN_YEAR}
-            max={MAX_YEAR}
-            value={year}
-            onChange={e => setYear(Number(e.target.value))}
+            type="range" min={MIN_YEAR} max={MAX_YEAR} value={year}
+            onChange={e => { setPlaying(false); setYear(Number(e.target.value)); }}
           />
           <span className="year-label">{MAX_YEAR}</span>
           <span className="current-year">{year}</span>
+          <select
+            className="speed-select"
+            value={speed}
+            onChange={e => setSpeed(Number(e.target.value))}
+            title="Animation speed"
+          >
+            <option value={200}>Slow</option>
+            <option value={50}>Normal</option>
+            <option value={12}>Fast</option>
+          </select>
         </div>
       </header>
 
       <div className="map-wrapper">
         <MapContainer
-          center={[50.5, 4.5]}
-          zoom={8}
+          center={MECHELEN}
+          zoom={12}
           style={{ height: '100%', width: '100%' }}
+          zoomControl={true}
         >
-          <TileLayerSwitcher year={year} />
-          <MapUpdater year={year} />
+          <BaseTileLayer config={tileConfig} />
 
-          {activeForests.map((f: ForestFeature) => (
-            <Polygon
-              key={f.id}
-              positions={f.coords}
-              pathOptions={{ color: f.color, fillColor: f.color, fillOpacity: 0.45, weight: 1 }}
-            >
-              <Popup>{f.name}</Popup>
-            </Polygon>
-          ))}
-
-          {activeRoads.map((r: RoadFeature) => (
+          {/* Water */}
+          {activeWater.map(w => (
             <Polyline
-              key={r.id}
-              positions={r.coords}
-              pathOptions={{ color: r.color, weight: r.width, opacity: 0.8 }}
+              key={w.id}
+              positions={w.coords}
+              pathOptions={{ color: '#4a90d9', weight: w.width, opacity: 0.7 }}
             >
-              <Popup>{r.name} (from {r.fromYear})</Popup>
+              <Popup><strong>{w.name}</strong></Popup>
             </Polyline>
           ))}
 
-          {urbanPolygons.map(city => city && (
+          {/* Vegetation */}
+          {activeVeg.map(v => (
             <Polygon
-              key={city.id}
-              positions={city.ring}
-              pathOptions={{ color: city.color, fillColor: city.color, fillOpacity: 0.35, weight: 1.5 }}
-            >
-              <Popup>{city.name} (c. {year})</Popup>
-            </Polygon>
-          ))}
-
-          {visibleEvents.map(event => (
-            <CircleMarker
-              key={event.id}
-              center={[event.lat, event.lng]}
-              radius={event.impact === 'major' ? 8 : 5}
+              key={v.id}
+              positions={v.coords}
               pathOptions={{
-                color: EVENT_COLORS[event.category] ?? '#3498db',
-                fillColor: EVENT_COLORS[event.category] ?? '#3498db',
-                fillOpacity: 0.85,
-                weight: 1.5,
+                color: VEGETATION_COLORS[v.type],
+                fillColor: VEGETATION_COLORS[v.type],
+                fillOpacity: 0.5,
+                weight: 1.2,
               }}
             >
               <Popup>
-                <strong>{event.year} — {event.title}</strong>
-                <p style={{ marginTop: 4 }}>{event.description}</p>
+                <strong>{v.name}</strong><br />
+                <em>{v.type}</em> · {v.fromYear}–{v.toYear === 2100 ? 'present' : v.toYear}
+              </Popup>
+            </Polygon>
+          ))}
+
+          {/* Roads */}
+          {activeRoads.map(r => {
+            const style = ROAD_STYLES[r.type];
+            return (
+              <Polyline
+                key={r.id}
+                positions={r.coords}
+                pathOptions={{ ...style, opacity: 0.85 }}
+              >
+                <Popup><strong>{r.name}</strong><br />From {r.fromYear}</Popup>
+              </Polyline>
+            );
+          })}
+
+          {/* Urban footprint */}
+          {urbanRings.map(u => (
+            <Polygon
+              key={u.id}
+              positions={u.coords}
+              pathOptions={{
+                color: '#c0392b',
+                fillColor: '#e74c3c',
+                fillOpacity: 0.28,
+                weight: 1.5,
+                dashArray: '3 2',
+              }}
+            >
+              <Popup>{u.name}</Popup>
+            </Polygon>
+          ))}
+
+          {/* Events */}
+          {visibleEvents.map(e => (
+            <CircleMarker
+              key={e.id}
+              center={[e.lat, e.lng]}
+              radius={e.impact === 'major' ? 9 : 6}
+              pathOptions={{
+                color: '#fff',
+                fillColor: '#e74c3c',
+                fillOpacity: 0.9,
+                weight: 2,
+              }}
+            >
+              <Popup>
+                <strong>{e.year} — {e.title}</strong>
+                <p style={{ marginTop: 4 }}>{e.description}</p>
               </Popup>
             </CircleMarker>
           ))}
         </MapContainer>
       </div>
 
-      <div className="controls">
-        <span className="controls-label">Layers:</span>
-        {[
-          { label: '🌲 Forests', value: showForests, set: setShowForests },
-          { label: '🛤 Roads', value: showRoads, set: setShowRoads },
-          { label: '🏙 Cities', value: showUrban, set: setShowUrban },
-          { label: '📍 Events', value: showEvents, set: setShowEvents },
-        ].map(({ label, value, set }) => (
-          <button
-            key={label}
-            className={`layer-btn ${value ? 'active' : ''}`}
-            onClick={() => set(v => !v)}
-          >
-            {label}
-          </button>
-        ))}
-        <span className="era-summary">{era.label} era · {visibleEvents.length} events</span>
+      <div className="legend">
+        <span className="leg-item"><span className="leg-dot" style={{ background: '#2d6a4f' }} />Forest</span>
+        <span className="leg-item"><span className="leg-dot" style={{ background: '#4a8fa8' }} />Wetland</span>
+        <span className="leg-item"><span className="leg-dot" style={{ background: '#9b7e46' }} />Heathland</span>
+        <span className="leg-item"><span className="leg-dot" style={{ background: '#6a9e3a' }} />Orchards</span>
+        <span className="leg-item"><span className="leg-dot" style={{ background: '#e74c3c' }} />Urban</span>
+        <span className="leg-item"><span className="leg-line" style={{ background: '#333', borderTop: '2px dashed #333' }} />Railway</span>
+        <span className="leg-item"><span className="leg-line" style={{ background: '#4a90d9' }} />Motorway</span>
       </div>
     </div>
   );
