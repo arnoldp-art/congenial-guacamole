@@ -179,63 +179,67 @@ export default function App() {
         </div>
       )}
 
-      {/* Controls */}
-      <div className="controls">
-        <button
-          className="play-btn"
-          onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}
-          title={playing ? 'Pause' : 'Play'}
-        >
-          {playing ? '⏸' : '▶'}
-        </button>
-        <span className="year-num">{year}</span>
-        <input
-          className="slider"
-          type="range"
-          min={MIN_YEAR}
-          max={MAX_YEAR}
-          value={year}
-          onChange={e => { setPlaying(false); setYear(Number(e.target.value)); }}
-        />
-        <div className="speed-btns">
-          {SPEEDS.map((s, i) => (
+      {/* Bottom bar: controls + timeline */}
+      <div className="bottom-bar">
+        <div className="controls-row">
+          <button
+            className="play-btn"
+            onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}
+            title={playing ? 'Pause' : 'Play'}
+          >
+            {playing ? '⏸' : '▶'}
+          </button>
+          <span className="year-num">{year}</span>
+          <div className="slider-wrap">
+            <input
+              className="slider"
+              type="range"
+              min={MIN_YEAR}
+              max={MAX_YEAR}
+              value={year}
+              onChange={e => { setPlaying(false); setYear(Number(e.target.value)); }}
+            />
+          </div>
+          <div className="speed-btns">
+            {SPEEDS.map((s, i) => (
+              <button
+                key={s.label}
+                className={`speed-btn ${speedIdx === i ? 'active' : ''}`}
+                onClick={() => setSpeedIdx(i)}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Timeline tick marks */}
+        <div className="tick-row">
+          {MAPS.map(m => (
             <button
-              key={s.label}
-              className={`speed-btn ${speedIdx === i ? 'active' : ''}`}
-              onClick={() => setSpeedIdx(i)}
+              key={m.id}
+              className="tick"
+              style={{ left: `${((m.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
+              onClick={() => { setPlaying(false); setYear(m.year); }}
+              title={`${m.year} · ${m.name}`}
             >
-              {s.label}
+              <span className="tick-line" />
+              <span className="tick-label">{m.year}</span>
+            </button>
+          ))}
+          {PAINTINGS.map(p => (
+            <button
+              key={p.id}
+              className="tick tick-painting"
+              style={{ left: `${((p.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
+              onClick={() => { setPlaying(false); setYear(p.year); setActivePainting(p); }}
+              title={`${p.year} · ${p.title} · ${p.creator}`}
+            >
+              <span className="tick-line" />
+              <span className="tick-label">🖼</span>
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Timeline ticks */}
-      <div className="tick-row">
-        {MAPS.map(m => (
-          <button
-            key={m.id}
-            className="tick"
-            style={{ left: `${((m.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
-            onClick={() => { setPlaying(false); setYear(m.year); }}
-            title={`${m.year} · ${m.name}`}
-          >
-            <span className="tick-line" />
-            <span className="tick-label">{m.year}</span>
-          </button>
-        ))}
-        {PAINTINGS.map(p => (
-          <button
-            key={p.id}
-            className="tick tick-painting"
-            style={{ left: `${((p.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
-            onClick={() => { setPlaying(false); setYear(p.year); setActivePainting(p); }}
-            title={`${p.year} · ${p.title} · ${p.creator}`}
-          >
-            <span className="tick-line" />
-            <span className="tick-label">🖼</span>
-          </button>
-        ))}
       </div>
     </div>
   );
