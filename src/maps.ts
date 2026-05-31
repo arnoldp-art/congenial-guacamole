@@ -24,15 +24,6 @@ const NGI_ORTHO = (id: string) =>
 
 export const MAPS: HistoricalMap[] = [
   {
-    id: 'pourbus',
-    year: 1571,
-    name: 'Pourbus map',
-    description: 'Painted map of the Brugse Vrije by Pieter Pourbus · 1571 · oldest detailed map of Flanders',
-    type: 'xyz',
-    url: DV('pourbus'),
-    attribution: '© Digitaal Vlaanderen – Pourbuskaart 1571',
-  },
-  {
     id: 'frickx',
     year: 1712,
     name: 'Frickx map',
@@ -180,5 +171,5 @@ export function computeOpacities(year: number): number[] {
   });
 }
 
-export const MIN_YEAR = 1571;
+export const MIN_YEAR = 1712;
 export const MAX_YEAR = 2000;
