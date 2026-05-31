@@ -156,6 +156,29 @@ body {
   background: #c9a84c; cursor: pointer;
   border: 2px solid #f0d070; box-shadow: 0 0 4px rgba(0,0,0,0.6);
 }
+/* ── Transport controls (skip + play) ───────────────────────────────────── */
+.transport { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.skip-btn {
+  background: #2a1e0a; border: 1px solid #4a3820;
+  border-radius: 6px; width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.78rem; color: #a09060; transition: all 0.15s;
+}
+.skip-btn:hover:not(:disabled) { background: #3a2810; border-color: #8a6030; color: #c9a84c; }
+.skip-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Map failed badge ────────────────────────────────────────────────────── */
+.map-failed-badge {
+  display: inline-block; margin-left: 6px;
+  font-size: 0.62rem; color: #e06030;
+  background: rgba(200,60,10,0.15); border: 1px solid rgba(200,80,20,0.35);
+  border-radius: 4px; padding: 1px 5px; vertical-align: middle;
+}
+.tick-failed .tick-line { background: rgba(220,80,30,0.7); }
+.tick-failed .tick-label { color: #c05030; }
+.tick-failed:hover .tick-line { background: #ff6040; }
+.tick-failed:hover .tick-label { color: #ff6040; }
+
 .speed-btns { display: flex; gap: 5px; flex-shrink: 0; }
 .speed-btn {
   background: rgba(40,28,8,0.8); border: 1px solid #4a3820;
@@ -274,6 +297,17 @@ body {
     gap: 12px;
     width: 100%;
   }
+  /* ── Mobile transport (skip + play) ── */
+  .mobile-transport { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .mobile-skip-btn {
+    background: #2a1e0a; border: 1px solid #4a3820;
+    border-radius: 8px; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: #a09060; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-skip-btn:disabled { opacity: 0.3; }
+
   .mobile-play-btn {
     background: #4a3820; border: 1px solid #6a5030;
     border-radius: 50%; width: 48px; height: 48px; flex-shrink: 0;
