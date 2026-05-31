@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/congenial-guacamole/static/css/main.6f323ce8.css",
+    "main.js": "/congenial-guacamole/static/js/main.17aee5a7.js",
+    "index.html": "/congenial-guacamole/index.html",
+    "main.6f323ce8.css.map": "/congenial-guacamole/static/css/main.6f323ce8.css.map",
+    "main.17aee5a7.js.map": "/congenial-guacamole/static/js/main.17aee5a7.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6f323ce8.css",
+    "static/js/main.17aee5a7.js"
+  ]
+}
