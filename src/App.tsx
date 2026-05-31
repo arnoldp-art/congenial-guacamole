@@ -29,16 +29,26 @@ export default function App() {
   const [expandedPainting, setExpandedPainting] = useState<Painting | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
   const [mobilePaintingOpen, setMobilePaintingOpen] = useState(false);
+  const [failedMaps, setFailedMaps] = useState<Set<string>>(new Set());
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevPrimaryRef = useRef(-1);
 
   const opacities = computeOpacities(year);
   const primaryIdx = opacities.indexOf(Math.max(...opacities));
   const secondaryIdx = opacities.findIndex((o, i) => i !== primaryIdx && o > 0.05);
   const inTransition = secondaryIdx !== -1;
 
+  // ── Pause automatically when a new map becomes primary ──────────────────
+  useEffect(() => {
+    if (prevPrimaryRef.current !== -1 && primaryIdx !== prevPrimaryRef.current && playing) {
+      setPlaying(false);
+    }
+    prevPrimaryRef.current = primaryIdx;
+  }, [primaryIdx]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Paintings ────────────────────────────────────────────────────────────
   const currentPaintings = PAINTINGS.filter(p => year >= p.showFromYear && year <= p.showToYear);
   const latestPainting = currentPaintings[currentPaintings.length - 1] ?? null;
-
   useEffect(() => {
     if (latestPainting?.id !== activePainting?.id) {
       setActivePainting(latestPainting);
@@ -46,6 +56,7 @@ export default function App() {
     }
   }, [latestPainting?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // ── Playback: year-by-year, pauses at map boundaries ────────────────────
   const tick = useCallback(() => {
     setYear(y => {
       if (y >= MAX_YEAR) { setPlaying(false); return MAX_YEAR; }
@@ -62,67 +73,95 @@ export default function App() {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [playing, speedIdx, tick]);
 
-  const paintingPanel = activePainting && (
+  // ── Skip to next / prev map ──────────────────────────────────────────────
+  const goNext = useCallback(() => {
+    setPlaying(false);
+    const next = MAPS.find(m => m.year > year);
+    if (next) setYear(next.year);
+  }, [year]);
+
+  const goPrev = useCallback(() => {
+    setPlaying(false);
+    const prev = [...MAPS].reverse().find(m => m.year < year);
+    if (prev) setYear(prev.year);
+  }, [year]);
+
+  const markFailed = useCallback((id: string) => {
+    setFailedMaps(s => { const n = new Set(s); n.add(id); return n; });
+  }, []);
+
+  const currentMapFailed = failedMaps.has(MAPS[primaryIdx]?.id);
+
+  // ── Painting panel content (shared desktop/mobile) ───────────────────────
+  const paintingContent = activePainting && (
     <>
       <div className="painting-header">
         <div className="painting-title">{activePainting.title}</div>
         <div className="painting-meta">{activePainting.creator} · {activePainting.year}</div>
         <div className="painting-actions">
-          <button
-            className={`overlay-btn ${showOverlay ? 'active' : ''}`}
-            onClick={() => setShowOverlay(v => !v)}
-          >
+          <button className={`overlay-btn ${showOverlay ? 'active' : ''}`}
+            onClick={() => setShowOverlay(v => !v)}>
             {showOverlay ? '🗺 Hide overlay' : '🗺 Map overlay'}
           </button>
           <button className="expand-btn" onClick={() => setExpandedPainting(activePainting)}>⛶</button>
         </div>
       </div>
       <div className="painting-thumb-wrap" onClick={() => setExpandedPainting(activePainting)}>
-        <img
-          src={activePainting.imageUrl}
-          alt={activePainting.title}
-          className="painting-thumb"
-          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
-        />
+        <img src={activePainting.imageUrl} alt={activePainting.title} className="painting-thumb"
+          onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
       </div>
       {currentPaintings.length > 1 && (
         <div className="painting-switcher">
           {currentPaintings.map(p => (
-            <button
-              key={p.id}
-              className={`switch-btn ${activePainting.id === p.id ? 'active' : ''}`}
-              onClick={() => setActivePainting(p)}
-            >
-              {p.year}
-            </button>
+            <button key={p.id} className={`switch-btn ${activePainting.id === p.id ? 'active' : ''}`}
+              onClick={() => setActivePainting(p)}>{p.year}</button>
           ))}
         </div>
       )}
     </>
   );
 
+  // ── Transport controls (shared desktop/mobile) ───────────────────────────
+  const transportControls = (isMobile = false) => {
+    const prefix = isMobile ? 'mobile-' : '';
+    return (
+      <div className={`${prefix}transport`}>
+        <button className={`${prefix}skip-btn`} onClick={goPrev} title="Previous map"
+          disabled={!MAPS.find(m => m.year < year)}>⏮</button>
+        <button className={`${prefix}play-btn`}
+          onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}>
+          {playing ? '⏸' : '▶'}
+        </button>
+        <button className={`${prefix}skip-btn`} onClick={goNext} title="Next map"
+          disabled={!MAPS.find(m => m.year > year)}>⏭</button>
+      </div>
+    );
+  };
+
   return (
     <div className="app">
       <div className="map-wrapper">
-        <MapContainer
-          center={MECHELEN}
-          zoom={ZOOM}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={true}
-        >
+        <MapContainer center={MECHELEN} zoom={ZOOM}
+          style={{ height: '100%', width: '100%' }} zoomControl={true}>
           <Recentre year={year} />
+
           {MAPS.map((m, i) => opacities[i] < 0.01 ? null : (
-            <TileLayer key={m.id} url={m.url} opacity={opacities[i]} attribution={m.attribution} />
+            <TileLayer key={m.id} url={m.url} opacity={opacities[i]} attribution={m.attribution}
+              eventHandlers={{ tileerror: () => markFailed(m.id) }} />
           ))}
+
           {showOverlay && activePainting && (
             <ImageOverlay url={activePainting.imageUrl} bounds={activePainting.bounds} opacity={0.65} />
           )}
         </MapContainer>
       </div>
 
-      {/* Map info — top left (both) */}
+      {/* Map info — top left */}
       <div className="map-info">
-        <div className="map-name">{MAPS[primaryIdx].name}</div>
+        <div className="map-name">
+          {MAPS[primaryIdx].name}
+          {currentMapFailed && <span className="map-failed-badge">⚠ not loading</span>}
+        </div>
         {inTransition ? (
           <div className="blend-indicator">
             <span>{MAPS[primaryIdx].name}</span>
@@ -136,33 +175,24 @@ export default function App() {
         )}
       </div>
 
-      {/* ── DESKTOP: painting panel top-right ── */}
-      {activePainting && (
-        <div className="painting-panel desktop-only">
-          {paintingPanel}
-        </div>
-      )}
+      {/* DESKTOP: painting panel */}
+      {activePainting && <div className="painting-panel desktop-only">{paintingContent}</div>}
 
-      {/* ── MOBILE: floating painting button + bottom sheet ── */}
+      {/* MOBILE: floating painting button */}
       {activePainting && (
-        <button
-          className="mobile-painting-btn mobile-only"
-          onClick={() => setMobilePaintingOpen(v => !v)}
-          title="View historical painting"
-        >
-          🖼
-          <span className="mobile-painting-badge">{activePainting.year}</span>
+        <button className="mobile-painting-btn mobile-only"
+          onClick={() => setMobilePaintingOpen(v => !v)}>
+          🖼<span className="mobile-painting-badge">{activePainting.year}</span>
         </button>
       )}
-
       {mobilePaintingOpen && activePainting && (
         <div className="mobile-painting-sheet mobile-only">
           <div className="mobile-sheet-handle" onClick={() => setMobilePaintingOpen(false)} />
-          {paintingPanel}
+          {paintingContent}
         </div>
       )}
 
-      {/* Full-size lightbox (both) */}
+      {/* Lightbox */}
       {expandedPainting && (
         <div className="lightbox" onClick={() => setExpandedPainting(null)}>
           <div className="lightbox-inner" onClick={e => e.stopPropagation()}>
@@ -177,12 +207,10 @@ export default function App() {
         </div>
       )}
 
-      {/* ── DESKTOP: bottom bar ── */}
+      {/* DESKTOP bottom bar */}
       <div className="bottom-bar desktop-only">
         <div className="controls-row">
-          <button className="play-btn" onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}>
-            {playing ? '⏸' : '▶'}
-          </button>
+          {transportControls(false)}
           <span className="year-num">{year}</span>
           <div className="slider-wrap">
             <input className="slider" type="range" min={MIN_YEAR} max={MAX_YEAR} value={year}
@@ -197,9 +225,11 @@ export default function App() {
         </div>
         <div className="tick-row">
           {MAPS.map(m => (
-            <button key={m.id} className="tick"
+            <button key={m.id}
+              className={`tick ${failedMaps.has(m.id) ? 'tick-failed' : ''}`}
               style={{ left: `${((m.year - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100}%` }}
-              onClick={() => { setPlaying(false); setYear(m.year); }} title={`${m.year} · ${m.name}`}>
+              onClick={() => { setPlaying(false); setYear(m.year); }}
+              title={`${m.year} · ${m.name}${failedMaps.has(m.id) ? ' (not loading)' : ''}`}>
               <span className="tick-line" /><span className="tick-label">{m.year}</span>
             </button>
           ))}
@@ -214,13 +244,10 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── MOBILE: bottom controls ── */}
+      {/* MOBILE bottom bar */}
       <div className="mobile-bar mobile-only">
-        {/* Year + play */}
         <div className="mobile-top-row">
-          <button className="mobile-play-btn" onClick={() => { if (year >= MAX_YEAR) setYear(MIN_YEAR); setPlaying(p => !p); }}>
-            {playing ? '⏸' : '▶'}
-          </button>
+          {transportControls(true)}
           <span className="mobile-year">{year}</span>
           <div className="mobile-speed-btns">
             {SPEEDS.map((s, i) => (
@@ -229,30 +256,23 @@ export default function App() {
             ))}
           </div>
         </div>
-
-        {/* Slider */}
         <div className="mobile-slider-row">
           <span className="mobile-year-edge">{MIN_YEAR}</span>
           <input className="mobile-slider" type="range" min={MIN_YEAR} max={MAX_YEAR} value={year}
             onChange={e => { setPlaying(false); setYear(Number(e.target.value)); }} />
           <span className="mobile-year-edge">{MAX_YEAR}</span>
         </div>
-
-        {/* Key era jump buttons */}
         <div className="mobile-era-row">
           {[...MAPS, ...PAINTINGS]
             .sort((a, b) => a.year - b.year)
-            .filter((m, i, arr) => i === 0 || m.year - arr[i-1].year > 20)
+            .filter((m, i, arr) => i === 0 || m.year - arr[i - 1].year > 20)
             .map(m => (
-              <button
-                key={m.id}
-                className={`mobile-era-btn ${'imageUrl' in m ? 'is-painting' : ''} ${year === m.year ? 'active' : ''}`}
-                onClick={() => { setPlaying(false); setYear(m.year); if ('imageUrl' in m) setActivePainting(m as Painting); }}
-              >
-                {'imageUrl' in m ? '🖼' : ''}{m.year}
+              <button key={m.id}
+                className={`mobile-era-btn ${'imageUrl' in m ? 'is-painting' : ''} ${year === m.year ? 'active' : ''} ${'imageUrl' in m ? '' : failedMaps.has((m as any).id) ? 'is-failed' : ''}`}
+                onClick={() => { setPlaying(false); setYear(m.year); if ('imageUrl' in m) setActivePainting(m as Painting); }}>
+                {'imageUrl' in m ? '🖼 ' : ''}{m.year}
               </button>
-            ))
-          }
+            ))}
         </div>
       </div>
     </div>
