@@ -144,5 +144,5 @@ export function computeOpacities(year: number): number[] {
   });
 }
 
-export const MIN_YEAR = 1500;
+export const MIN_YEAR = 1712;
 export const MAX_YEAR = 2000;
