@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import { MAPS, MIN_YEAR, MAX_YEAR } from './maps';
 import { MAPS_HK, MIN_YEAR_HK, MAX_YEAR_HK } from './maps-hk';
+import { MAPS_LONDON, MIN_YEAR_LONDON, MAX_YEAR_LONDON } from './maps-london';
 import { CityConfig } from './cities';
 import CitySelect from './CitySelect';
 
@@ -31,6 +32,17 @@ const CITIES: CityConfig[] = [
     maxYear: MAX_YEAR_HK,
     maps: MAPS_HK,
     heroColor: '#e05030',
+  },
+  {
+    id: 'hendon',
+    name: 'Hendon',
+    subtitle: 'London Borough of Barnet, England',
+    center: [51.5906, -0.2283],
+    zoom: 13,
+    minYear: MIN_YEAR_LONDON,
+    maxYear: MAX_YEAR_LONDON,
+    maps: MAPS_LONDON,
+    heroColor: '#1a5276',
   },
 ];
 
