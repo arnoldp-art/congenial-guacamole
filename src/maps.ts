@@ -15,6 +15,18 @@ const DV = (layer: string) =>
   `&LAYER=${layer}&STYLE=&FORMAT=image/png` +
   `&TILEMATRIXSET=GoogleMapsVL&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}`;
 
+// Digitaal Vlaanderen OKZ — historical aerial mosaics (Flanders only)
+const DV_OKZ = (layer: string) =>
+  `https://geo.api.vlaanderen.be/OKZ/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile` +
+  `&LAYER=${layer}&STYLE=&FORMAT=image/png` +
+  `&TILEMATRIXSET=GoogleMapsVL&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}`;
+
+// Digitaal Vlaanderen OMW — medium-scale winter orthophoto time series (25 cm, from 2000)
+const DV_OMW = (layer: string) =>
+  `https://geo.api.vlaanderen.be/OMW/wmts?SERVICE=WMTS&VERSION=1.0.0&REQUEST=GetTile` +
+  `&LAYER=${layer}&STYLE=&FORMAT=image/png` +
+  `&TILEMATRIXSET=GoogleMapsVL&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}`;
+
 // NGI/IGN Belgium tile series — note: {z}/{y}/{x} (y before x — Esri convention)
 const NGI_TOPO = (id: string) =>
   `https://wmts.ngi.be/arcgis/rest/services/seamless_carto__default__3857__${id}/MapServer/tile/{z}/{y}/{x}`;
@@ -35,6 +47,24 @@ export const MAPS: HistoricalMap[] = [
     type: 'xyz',
     url: DV('frickx'),
     attribution: '© Digitaal Vlaanderen – Frickx 1712',
+  },
+  {
+    id: 'masse',
+    year: 1729,
+    name: 'Masse map',
+    description: 'Military reconnaissance map of the Austrian Netherlands · Masse · 1729–1730',
+    type: 'xyz',
+    url: DV('masse'),
+    attribution: '© Digitaal Vlaanderen – Massekaart 1729–1730',
+  },
+  {
+    id: 'villaret',
+    year: 1745,
+    name: 'Villaret map',
+    description: 'Survey of the Austrian Netherlands · Villaret · 1745–1748',
+    type: 'xyz',
+    url: DV('villaret'),
+    attribution: '© Digitaal Vlaanderen – Villaretkaart 1745–1748',
   },
   {
     id: 'ferraris',
@@ -118,8 +148,17 @@ export const MAPS: HistoricalMap[] = [
     attribution: '© NGI/IGN Belgium',
   },
   {
-    id: 'ortho-1971',
+    id: 'okz-1971',
     year: 1971,
+    name: 'Aerial survey 1971',
+    description: 'Panchromatic aerial mosaic of Flanders · Digitaal Vlaanderen OKZ',
+    type: 'xyz',
+    url: DV_OKZ('okzpan71vl'),
+    attribution: '© Digitaal Vlaanderen – OKZ 1971',
+  },
+  {
+    id: 'ortho-1971',
+    year: 1974,
     name: 'Aerial survey 1969–1979',
     description: 'Orthophoto mosaic covering Belgium 1969–1979',
     type: 'xyz',
@@ -145,6 +184,15 @@ export const MAPS: HistoricalMap[] = [
     attribution: '© NGI/IGN Belgium',
   },
   {
+    id: 'okz-1979-90',
+    year: 1990,
+    name: 'Aerial survey 1979–1990',
+    description: 'Colour aerial mosaic of Flanders 1979–1990 · Digitaal Vlaanderen OKZ',
+    type: 'xyz',
+    url: DV_OKZ('okzrgb79_90vl'),
+    attribution: '© Digitaal Vlaanderen – OKZ 1979–1990',
+  },
+  {
     id: 'ortho-1995',
     year: 1995,
     name: 'Aerial survey 1995',
@@ -154,6 +202,51 @@ export const MAPS: HistoricalMap[] = [
     attribution: '© NGI/IGN Belgium',
   },
   {
+    id: 'omw-2001',
+    year: 2001,
+    name: 'Orthophoto 2000–2003',
+    description: '25 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb00_03vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2000–2003',
+  },
+  {
+    id: 'omw-2006',
+    year: 2006,
+    name: 'Orthophoto 2005–2007',
+    description: '25 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb05_07vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2005–2007',
+  },
+  {
+    id: 'omw-2010',
+    year: 2010,
+    name: 'Orthophoto 2008–2011',
+    description: '25 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb08_11vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2008–2011',
+  },
+  {
+    id: 'omw-2015',
+    year: 2015,
+    name: 'Orthophoto 2015',
+    description: '25 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb15vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2015',
+  },
+  {
+    id: 'omw-2018',
+    year: 2018,
+    name: 'Orthophoto 2018',
+    description: '25 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb18vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2018',
+  },
+  {
     id: 'satellite',
     year: 2020,
     name: 'Satellite imagery',
@@ -161,6 +254,15 @@ export const MAPS: HistoricalMap[] = [
     type: 'xyz',
     url: ESRI('World_Imagery'),
     attribution: '© Esri, Maxar, Earthstar Geographics',
+  },
+  {
+    id: 'omw-2022',
+    year: 2022,
+    name: 'Orthophoto 2022',
+    description: '15 cm colour aerial mosaic of Flanders · Digitaal Vlaanderen OMW',
+    type: 'xyz',
+    url: DV_OMW('omwrgb22vl'),
+    attribution: '© Digitaal Vlaanderen – OMW 2022',
   },
 ];
 
