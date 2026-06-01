@@ -11,7 +11,7 @@ body {
 #root { height: 100vh; }
 .app { position: relative; height: 100vh; display: flex; flex-direction: column; }
 .map-wrapper { flex: 1; min-height: 0; }
-.leaflet-layer { transition: opacity 0.5s ease; }
+.leaflet-layer { }
 
 /* ── Show/hide helpers ───────────────────────────────────────────────────── */
 .desktop-only { display: block; }
@@ -36,6 +36,24 @@ body {
 .blend-indicator span { font-size: 0.65rem; color: #a09060; white-space: nowrap; }
 .blend-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
 .blend-fill { height: 100%; background: #c9a84c; border-radius: 2px; transition: width 0.1s; }
+
+/* ── Back / city switcher button ────────────────────────────────────────── */
+.back-btn {
+  position: absolute;
+  top: 16px; right: 16px;
+  z-index: 1000;
+  background: rgba(10,8,4,0.85);
+  border: 1px solid rgba(180,140,60,0.35);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 0.72rem;
+  color: #a09060;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.back-btn:hover { border-color: #c9a84c; color: #c9a84c; }
 
 /* ── Painting panel — desktop (top-right) ────────────────────────────────── */
 .painting-panel {

@@ -1,0 +1,152 @@
+/* ── City selection screen ───────────────────────────────────────────────── */
+
+.city-select {
+  position: fixed; inset: 0; z-index: 9000;
+  background: #080604;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 48px;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.city-select.cs-visible { opacity: 1; }
+
+/* Subtle grid texture */
+.city-select::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(180,140,60,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180,140,60,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* ── Header ── */
+.cs-header {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-16px);
+  animation: cs-rise 0.7s 0.2s ease forwards;
+}
+.cs-title {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 700;
+  color: #f0d070;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-shadow: 0 0 40px rgba(240,200,80,0.35);
+}
+.cs-subtitle {
+  font-size: 0.85rem;
+  color: #6a5830;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+/* ── Cards ── */
+.cs-cards {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cs-rise 0.7s 0.4s ease forwards;
+}
+
+.cs-card {
+  position: relative;
+  width: 280px; min-height: 340px;
+  background: rgba(12,10,4,0.9);
+  border: 1px solid rgba(180,140,60,0.2);
+  border-radius: 14px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  padding: 0;
+  display: flex; flex-direction: column;
+}
+.cs-card:hover, .cs-card.cs-hovered {
+  border-color: var(--accent, #c9a84c);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 30px color-mix(in srgb, var(--accent, #c9a84c) 20%, transparent);
+}
+
+/* Glowing accent bar at top */
+.cs-card-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--accent, #c9a84c);
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 0 12px var(--accent, #c9a84c);
+}
+.cs-card:hover .cs-card-glow, .cs-card.cs-hovered .cs-card-glow { opacity: 1; }
+
+.cs-card-body {
+  padding: 32px 28px 28px;
+  display: flex; flex-direction: column;
+  height: 100%;
+  text-align: left;
+}
+.cs-city-name {
+  font-size: 1.7rem; font-weight: 700;
+  color: #e8dcc8;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+.cs-city-sub {
+  font-size: 0.78rem;
+  color: #7a6840;
+  margin-top: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cs-city-range {
+  font-size: 1.1rem;
+  color: var(--accent, #c9a84c);
+  font-weight: 600;
+  margin-top: 20px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+.cs-card-cta {
+  margin-top: auto;
+  padding-top: 28px;
+  font-size: 0.82rem;
+  color: rgba(200,160,60,0.5);
+  letter-spacing: 0.15em;
+  transition: color 0.2s, letter-spacing 0.2s;
+}
+.cs-card:hover .cs-card-cta {
+  color: var(--accent, #c9a84c);
+  letter-spacing: 0.22em;
+}
+
+/* ── Footer ── */
+.cs-footer {
+  font-size: 0.72rem;
+  color: #3a2e18;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: cs-rise 0.5s 0.8s ease forwards;
+}
+
+@keyframes cs-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Mobile tweaks ── */
+@media (max-width: 640px) {
+  .cs-cards { gap: 16px; }
+  .cs-card { width: min(100%, 320px); min-height: 220px; }
+  .cs-card-body { padding: 24px 20px 20px; }
+  .cs-city-name { font-size: 1.4rem; }
+  .city-select { gap: 32px; }
+}
