@@ -56,15 +56,6 @@ export const MAPS_LONDON: HistoricalMap[] = [
     attribution: '© National Library of Scotland – OS 1-inch 2nd edition',
   },
   {
-    id: 'london-bartholomew-1900',
-    year: 1900,
-    name: 'Bartholomew Half-Inch 1897–1907',
-    description: 'John Bartholomew & Son half-inch to the mile · Great Britain · coloured layer representation · late Victorian / Edwardian era',
-    type: 'xyz',
-    url: NLS_GEO_TMS('mapdata2/bartholomew/great_britain'),
-    attribution: '© National Library of Scotland – Bartholomew Half-Inch Great Britain',
-  },
-  {
     id: 'london-os1in-revised-1907',
     year: 1907,
     name: 'OS 1-inch Revised New edition c.1907',
@@ -92,15 +83,6 @@ export const MAPS_LONDON: HistoricalMap[] = [
     attribution: '© National Library of Scotland – OS New Popular edition',
   },
   {
-    id: 'london-os25k-1955',
-    year: 1955,
-    name: 'OS 1:25,000 1st Series 1937–1961',
-    description: 'Ordnance Survey 1:25,000 · 1st Series (Provisional edition) · National Grid · post-war detailed mapping of Great Britain',
-    type: 'xyz',
-    url: NLS_GEO_TMS('mapdata2/os/25000'),
-    attribution: '© National Library of Scotland – OS 1:25,000 1st Series',
-  },
-  {
     id: 'london-os1250-1960',
     year: 1960,
     name: 'OS 1:1,250 London National Grid c.1947–1963',
@@ -108,15 +90,6 @@ export const MAPS_LONDON: HistoricalMap[] = [
     type: 'xyz',
     url: NLS_S3('london_1940s'),
     attribution: '© National Library of Scotland – OS 1:1,250 London National Grid',
-  },
-  {
-    id: 'london-os7th-1963',
-    year: 1963,
-    name: 'OS 1-inch 7th Series 1952–1973',
-    description: 'Ordnance Survey 1-inch to the mile · 7th Series · National Grid · standard topographic map of Great Britain in the post-war era',
-    type: 'xyz',
-    url: NLS_GEO_TMS('mapdata2/os/seventh'),
-    attribution: '© National Library of Scotland – OS 1-inch 7th Series',
   },
   {
     id: 'london-satellite',
