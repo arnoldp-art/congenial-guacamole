@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/congenial-guacamole/static/css/main.3d02e5ab.css",
-    "main.js": "/congenial-guacamole/static/js/main.6f44a76e.js",
+    "main.js": "/congenial-guacamole/static/js/main.bf706080.js",
     "index.html": "/congenial-guacamole/index.html",
     "main.3d02e5ab.css.map": "/congenial-guacamole/static/css/main.3d02e5ab.css.map",
-    "main.6f44a76e.js.map": "/congenial-guacamole/static/js/main.6f44a76e.js.map"
+    "main.bf706080.js.map": "/congenial-guacamole/static/js/main.bf706080.js.map"
   },
   "entrypoints": [
     "static/css/main.3d02e5ab.css",
-    "static/js/main.6f44a76e.js"
+    "static/js/main.bf706080.js"
   ]
 }
