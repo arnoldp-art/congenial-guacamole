@@ -152,7 +152,6 @@ function MapView({ city, onBack, initialYear, initialCompare }: {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevPrimaryRef = useRef(-1);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const isDraggingDivider = useRef(false);
 
   const primaryIdx = activeMapIdx(maps, year);
@@ -202,21 +201,6 @@ function MapView({ city, onBack, initialYear, initialCompare }: {
   const markFailed = useCallback((id: string) => {
     setFailedMaps(s => { const n = new Set(s); n.add(id); return n; });
   }, []);
-
-  // Mobile swipe handlers
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  }, []);
-
-  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    if (!touchStartRef.current) return;
-    const dx = e.changedTouches[0].clientX - touchStartRef.current.x;
-    const dy = e.changedTouches[0].clientY - touchStartRef.current.y;
-    touchStartRef.current = null;
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) goNext(); else goPrev();
-    }
-  }, [goNext, goPrev]);
 
   // Slider snap on mouse/touch up
   const handleSliderMouseUp = useCallback(() => {
@@ -391,8 +375,6 @@ function MapView({ city, onBack, initialYear, initialCompare }: {
       <div
         className="map-wrapper"
         ref={wrapperRef}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       >
         <MapContainer center={center} zoom={zoom}
           style={{ height: '100%', width: '100%' }} zoomControl={true}>
